@@ -1,0 +1,267 @@
+.sentiment-card {
+  height: 100%;
+  overflow-y: auto;
+  background: white;
+}
+
+.welcome-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 20px;
+}
+
+.welcome-content {
+  text-align: center;
+  max-width: 300px;
+}
+
+.welcome-content h3 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.welcome-content p {
+  margin: 0 0 24px 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.analyze-button {
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 24px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analyze-button.primary {
+  background: #1976d2;
+  color: white;
+}
+
+.analyze-button.primary:hover:not(:disabled) {
+  background: #1565c0;
+  transform: translateY(-1px);
+}
+
+.analyze-button.secondary {
+  background: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+.analyze-button.secondary:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.analyze-button.small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.analyze-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1976d2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-section p {
+  margin: 0 0 4px 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.loading-section small {
+  color: #666;
+}
+
+.error-section {
+  padding: 20px;
+  text-align: center;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.analysis-results {
+  padding: 20px;
+}
+
+.score-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.score-circle {
+  width: 120px;
+  height: 120px;
+  border: 4px solid;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: white;
+}
+
+.score-number {
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #666;
+  margin-top: 4px;
+  line-height: 1.1;
+}
+
+.sentiment-overview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.sentiment-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sentiment-emoji {
+  font-size: 20px;
+}
+
+.sentiment-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.confidence-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  letter-spacing: 0.5px;
+}
+
+.summary-section,
+.pros-section,
+.cons-section,
+.themes-section {
+  margin-bottom: 20px;
+}
+
+.summary-section h4,
+.pros-section h4,
+.cons-section h4,
+.themes-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.summary-section p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #555;
+}
+
+.pros-section ul,
+.cons-section ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.pros-section li,
+.cons-section li {
+  margin-bottom: 4px;
+  font-size: 13px;
+  line-height: 1.3;
+  color: #555;
+}
+
+.themes-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.theme-tag {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.metadata-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 20px;
+}
+
+.metadata-section small {
+  color: #666;
+  font-size: 12px;
+}

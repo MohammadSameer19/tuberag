@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: tuberag-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app --bind 0.0.0.0:$PORT --timeout 120
+    envVars:
+      - key: PERPLEXITY_API_KEY
+        sync: false
+      - key: CHROMA_PERSIST_DIR
+        value: /opt/render/project/data/chroma_db
+    disk:
+      name: chroma-data
+      mountPath: /opt/render/project/data
+      sizeGB: 1

@@ -1,0 +1,19 @@
+# TubeRAG Backend Requirements
+
+flask==3.0.0
+flask-cors==4.0.0
+python-dotenv==1.0.0
+requests==2.31.0
+gunicorn==21.2.0
+
+# Transcript fetching
+youtube-transcript-api>=1.2.0
+
+# Comment fetching (no API key needed)
+youtube-comment-downloader
+
+# Vector database
+chromadb>=1.0.0
+
+# Local embeddings (no API quota issues)
+sentence-transformers

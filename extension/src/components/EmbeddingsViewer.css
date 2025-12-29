@@ -1,0 +1,255 @@
+.embeddings-viewer {
+  height: 100%;
+  overflow-y: auto;
+  background: white;
+}
+
+.welcome-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 20px;
+}
+
+.welcome-content {
+  text-align: center;
+  max-width: 300px;
+}
+
+.welcome-content h3 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.welcome-content p {
+  margin: 0 0 24px 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.inspect-button {
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 24px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inspect-button.primary {
+  background: #1976d2;
+  color: white;
+}
+
+.inspect-button.primary:hover:not(:disabled) {
+  background: #1565c0;
+  transform: translateY(-1px);
+}
+
+.inspect-button.secondary {
+  background: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+.inspect-button.secondary:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.inspect-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loading-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1976d2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-section {
+  padding: 20px;
+  text-align: center;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.embeddings-results {
+  padding: 20px;
+}
+
+.summary-section h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.summary-stats {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.stat-item:last-child {
+  margin-bottom: 0;
+}
+
+.stat-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.stat-value {
+  color: #333;
+  font-family: monospace;
+}
+
+.chunks-section h4 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 14px;
+}
+
+.chunk-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: #fafafa;
+}
+
+.chunk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.chunk-id {
+  font-family: monospace;
+  font-size: 12px;
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.embedding-status {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.chunk-text strong,
+.chunk-embedding strong,
+.chunk-metadata strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #555;
+}
+
+.chunk-text p {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  line-height: 1.4;
+  background: white;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.chunk-text small {
+  color: #666;
+  font-size: 11px;
+}
+
+.chunk-text,
+.chunk-embedding {
+  margin-bottom: 12px;
+}
+
+.embedding-details {
+  background: white;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.embedding-details div {
+  margin-bottom: 4px;
+}
+
+.chunk-metadata pre {
+  background: white;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  font-size: 11px;
+  margin: 0;
+  overflow-x: auto;
+}
+
+.actions-section {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.no-data-section {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.no-data-section h3 {
+  margin: 0 0 16px 0;
+  color: #666;
+}
+
+.no-data-section p {
+  margin: 0 0 24px 0;
+  color: #666;
+  font-size: 14px;
+}
