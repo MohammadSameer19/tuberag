@@ -10,8 +10,4 @@ services:
       - key: PERPLEXITY_API_KEY
         sync: false
       - key: CHROMA_PERSIST_DIR
-        value: /opt/render/project/data/chroma_db
-    disk:
-      name: chroma-data
-      mountPath: /opt/render/project/data
-      sizeGB: 1
+        value: ./chroma_db
