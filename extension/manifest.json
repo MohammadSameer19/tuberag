@@ -10,7 +10,8 @@
   "host_permissions": [
     "*://www.youtube.com/*",
     "*://youtube.com/*",
-    "http://localhost:8000/*"
+    "http://localhost:8000/*",
+    "https://tuberag-backend.onrender.com/*"
   ],
   "background": {
     "service_worker": "background.js"

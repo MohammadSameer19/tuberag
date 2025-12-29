@@ -16,11 +16,8 @@ logger = logging.getLogger(__name__)
 # Initialize Flask app
 app = Flask(__name__)
 
-# Configure CORS for Chrome Extension
-CORS(
-    app,
-    origins=["chrome-extension://*", "http://localhost:*", "https://localhost:*"],
-)
+# Configure CORS for Chrome Extension and web access
+CORS(app, origins="*")
 
 # Get API keys from environment
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
