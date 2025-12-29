@@ -3,7 +3,7 @@ import ChatWindow from './components/ChatWindow';
 import SentimentCard from './components/SentimentCard';
 import EmbeddingsViewer from './components/EmbeddingsViewer';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://tuberag-backend.onrender.com';
 
 function App() {
   const [activeTab, setActiveTab] = useState('chat');
