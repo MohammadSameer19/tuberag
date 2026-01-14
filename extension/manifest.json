@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "TubeRAG - Chat with YouTube Videos",
+  "version": "1.0.0",
+  "description": "Chat with YouTube videos using AI and analyze sentiment from comments",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://www.youtube.com/*",
+    "*://youtube.com/*",
+    "http://localhost:8000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*", "*://youtube.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_title": "Open TubeRAG",
+    "default_popup": "index.html"
+  }
+}

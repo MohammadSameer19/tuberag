@@ -1,0 +1,7 @@
+flask==3.0.0
+flask-cors==4.0.0
+python-dotenv==1.0.0
+youtube-transcript-api>=1.2.0
+youtube-comment-downloader>=0.1.0
+requests==2.31.0
+chromadb>=1.0.0
