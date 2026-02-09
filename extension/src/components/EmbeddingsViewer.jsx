@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import './EmbeddingsViewer.css';
 
-function EmbeddingsViewer({ videoId, apiBaseUrl }) {
-  const [embeddings, setEmbeddings] = useState(null);
+function EmbeddingsViewer({ videoId, apiBaseUrl, embeddings, setEmbeddings }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 

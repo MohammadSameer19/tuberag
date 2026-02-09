@@ -172,8 +172,14 @@ def chat_with_video():
 
         video_id = data.get("video_id", "")
         question = data.get("question", "")
+        clear_history = data.get("clear_history", False)
 
         logger.info(f"Chat request for video {video_id}: {question}")
+        
+        # Clear conversation history if requested
+        if clear_history:
+            rag_engine.clear_conversation_history(video_id)
+            logger.info(f"Cleared conversation history for video {video_id}")
 
         # Validate video ID
         if not video_id or len(video_id) != 11:

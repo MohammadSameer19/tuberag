@@ -12,6 +12,30 @@
   padding-bottom: 8px;
 }
 
+.chat-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.clear-chat-button {
+  padding: 6px 12px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.clear-chat-button:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
 .welcome-message {
   text-align: center;
   padding: 20px;

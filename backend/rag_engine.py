@@ -32,6 +32,9 @@ class ChromaDBVideoRAG:
         # Current video state
         self.current_video_id = None
         self.current_collection = None
+        
+        # Conversation history for context memory
+        self.conversation_history = {}
 
     def _get_embedding(self, text: str) -> List[float]:
         """Get embedding for text using local sentence-transformers."""
@@ -109,6 +112,10 @@ class ChromaDBVideoRAG:
     def load_video(self, video_id: str) -> bool:
         """Load a video into ChromaDB for RAG processing."""
         try:
+            # Clear conversation history when switching videos
+            if self.current_video_id != video_id:
+                logger.info(f"Switching from video {self.current_video_id} to {video_id}")
+            
             if self.current_video_id == video_id and self.current_collection is not None:
                 return True
 
@@ -173,8 +180,8 @@ class ChromaDBVideoRAG:
             logger.error(f"Error loading video {video_id}: {str(e)}")
             return False
 
-    def query(self, question: str, k: int = 4) -> str:
-        """Query the loaded video using RAG with ChromaDB."""
+    def query(self, question: str, k: int = 4, use_context: bool = True) -> str:
+        """Query the loaded video using RAG with ChromaDB and conversation context."""
         if not self.current_collection or not self.current_video_id:
             return "No video loaded. Please load a video first."
 
@@ -194,21 +201,53 @@ class ChromaDBVideoRAG:
 
             context = "\n\n".join(relevant_chunks)
 
+            # Initialize conversation history for this video if not exists
+            if self.current_video_id not in self.conversation_history:
+                self.conversation_history[self.current_video_id] = []
+
+            # Build conversation context
+            conversation_context = ""
+            if use_context and self.conversation_history[self.current_video_id]:
+                conversation_context = "\n\nPrevious Conversation:\n"
+                for i, exchange in enumerate(self.conversation_history[self.current_video_id][-3:]):  # Last 3 exchanges
+                    conversation_context += f"Q{i+1}: {exchange['question']}\nA{i+1}: {exchange['answer']}\n"
+
             prompt = f"""Based on the following YouTube video transcript, please answer the question.
 
 Video Transcript Context:
 {context}
+{conversation_context}
 
-Question: {question}
+Current Question: {question}
 
-Please provide a helpful and accurate answer based only on the information available in the video transcript.
+Please provide a helpful and accurate answer based on the information available in the video transcript and previous conversation context.
 If the information is not available in the transcript, please say so."""
 
-            return self._generate_content(prompt)
+            answer = self._generate_content(prompt)
+            
+            # Store conversation history
+            self.conversation_history[self.current_video_id].append({
+                "question": question,
+                "answer": answer
+            })
+            
+            # Keep only last 10 exchanges to avoid token limits
+            if len(self.conversation_history[self.current_video_id]) > 10:
+                self.conversation_history[self.current_video_id] = self.conversation_history[self.current_video_id][-10:]
+
+            return answer
 
         except Exception as e:
             logger.error(f"Error querying video: {str(e)}")
             return f"Sorry, I encountered an error: {str(e)}"
+    
+    def clear_conversation_history(self, video_id: str = None):
+        """Clear conversation history for a specific video or all videos."""
+        if video_id:
+            if video_id in self.conversation_history:
+                self.conversation_history[video_id] = []
+        else:
+            self.conversation_history = {}
 
     def delete_video(self, video_id: str) -> bool:
         """Delete a video's data from ChromaDB."""

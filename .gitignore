@@ -56,7 +56,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # Build
-extension/dist/
 extension/build/
 *.zip
 
@@ -64,3 +63,8 @@ extension/build/
 *.tmp
 *.temp
 .cache/
+
+# Readme Files
+CLEANUP_SUMMARY.md
+CONTEXT_MEMORY.md
+LOAD_EXTENSION.md

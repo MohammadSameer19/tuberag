@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './ChatWindow.css';
 
-function ChatWindow({ videoId, apiBaseUrl }) {
-  const [messages, setMessages] = useState([]);
+function ChatWindow({ videoId, apiBaseUrl, messages, setMessages }) {
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -16,9 +15,8 @@ function ChatWindow({ videoId, apiBaseUrl }) {
     scrollToBottom();
   }, [messages]);
 
-  // Reset messages when video changes
+  // Clear error when video changes (messages are cleared by parent)
   useEffect(() => {
-    setMessages([]);
     setError(null);
   }, [videoId]);
 
@@ -48,7 +46,8 @@ function ChatWindow({ videoId, apiBaseUrl }) {
         },
         body: JSON.stringify({
           video_id: videoId,
-          question: userMessage
+          question: userMessage,
+          clear_history: false
         })
       });
 
@@ -90,6 +89,11 @@ function ChatWindow({ videoId, apiBaseUrl }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const clearChat = () => {
+    setMessages([]);
+    setError(null);
   };
 
   const handleKeyPress = (e) => {
@@ -135,6 +139,18 @@ function ChatWindow({ videoId, apiBaseUrl }) {
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {messages.length > 0 && (
+          <div className="chat-header">
+            <button 
+              className="clear-chat-button"
+              onClick={clearChat}
+              title="Clear chat history"
+            >
+              🗑️ Clear Chat
+            </button>
           </div>
         )}
 

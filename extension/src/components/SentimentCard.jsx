@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import './SentimentCard.css';
 
-function SentimentCard({ videoId, apiBaseUrl }) {
-  const [analysis, setAnalysis] = useState(null);
+function SentimentCard({ videoId, apiBaseUrl, analysis, setAnalysis }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 

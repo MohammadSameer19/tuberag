@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ChatWindow from './components/ChatWindow';
 import SentimentCard from './components/SentimentCard';
 import EmbeddingsViewer from './components/EmbeddingsViewer';
@@ -10,6 +10,11 @@ function App() {
   const [videoId, setVideoId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Persistent state for each tab
+  const [chatMessages, setChatMessages] = useState([]);
+  const [sentimentAnalysis, setSentimentAnalysis] = useState(null);
+  const [embeddingsData, setEmbeddingsData] = useState(null);
 
   useEffect(() => {
     const getCurrentVideoId = async () => {
@@ -26,6 +31,12 @@ function App() {
             }
 
             if (response && response.videoId) {
+              // Clear state when video changes
+              if (response.videoId !== videoId) {
+                setChatMessages([]);
+                setSentimentAnalysis(null);
+                setEmbeddingsData(null);
+              }
               setVideoId(response.videoId);
               setError(null);
             } else {
@@ -49,6 +60,12 @@ function App() {
 
     const handleMessage = (message) => {
       if (message.type === 'VIDEO_CHANGED') {
+        // Clear state when video changes
+        if (message.videoId !== videoId) {
+          setChatMessages([]);
+          setSentimentAnalysis(null);
+          setEmbeddingsData(null);
+        }
         setVideoId(message.videoId);
         setError(null);
       }
@@ -58,11 +75,39 @@ function App() {
       chrome.runtime.onMessage.addListener(handleMessage);
       return () => chrome.runtime.onMessage.removeListener(handleMessage);
     }
-  }, []);
+  }, [videoId]);
 
   const formatVideoId = (id) => {
     return id ? `${id.substring(0, 8)}...` : 'None';
   };
+
+  // Memoize components to prevent unnecessary re-renders
+  const chatWindow = useMemo(() => (
+    <ChatWindow 
+      videoId={videoId} 
+      apiBaseUrl={API_BASE_URL}
+      messages={chatMessages}
+      setMessages={setChatMessages}
+    />
+  ), [videoId, chatMessages]);
+
+  const sentimentCard = useMemo(() => (
+    <SentimentCard 
+      videoId={videoId} 
+      apiBaseUrl={API_BASE_URL}
+      analysis={sentimentAnalysis}
+      setAnalysis={setSentimentAnalysis}
+    />
+  ), [videoId, sentimentAnalysis]);
+
+  const embeddingsViewer = useMemo(() => (
+    <EmbeddingsViewer 
+      videoId={videoId} 
+      apiBaseUrl={API_BASE_URL}
+      embeddings={embeddingsData}
+      setEmbeddings={setEmbeddingsData}
+    />
+  ), [videoId, embeddingsData]);
 
   return (
     <div className="app">
@@ -102,13 +147,15 @@ function App() {
           </div>
 
           <div className="content">
-            {activeTab === 'chat' ? (
-              <ChatWindow videoId={videoId} apiBaseUrl={API_BASE_URL} />
-            ) : activeTab === 'sentiment' ? (
-              <SentimentCard videoId={videoId} apiBaseUrl={API_BASE_URL} />
-            ) : (
-              <EmbeddingsViewer videoId={videoId} apiBaseUrl={API_BASE_URL} />
-            )}
+            <div style={{ display: activeTab === 'chat' ? 'flex' : 'none', flexDirection: 'column', height: '100%' }}>
+              {chatWindow}
+            </div>
+            <div style={{ display: activeTab === 'sentiment' ? 'flex' : 'none', flexDirection: 'column', height: '100%' }}>
+              {sentimentCard}
+            </div>
+            <div style={{ display: activeTab === 'embeddings' ? 'flex' : 'none', flexDirection: 'column', height: '100%' }}>
+              {embeddingsViewer}
+            </div>
           </div>
         </>
       )}
