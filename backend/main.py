@@ -5,6 +5,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from rag_engine import ChromaDBVideoRAG
 from sentiment_engine import analyze_video_sentiment
+from notes_engine import NotesGenerator
 
 # Load environment variables
 load_dotenv()
@@ -31,6 +32,10 @@ if not PERPLEXITY_API_KEY:
 # Initialize ChromaDB RAG engine with Perplexity
 PERSIST_DIR = os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")
 rag_engine = ChromaDBVideoRAG(PERPLEXITY_API_KEY, PERSIST_DIR)
+
+# Initialize Notes Generator
+notes_generator = NotesGenerator(PERPLEXITY_API_KEY)
+
 
 
 @app.route("/", methods=["GET"])
@@ -334,6 +339,131 @@ def analyze_video():
                 "success": False,
                 "error": str(e),
             }
+        )
+
+
+@app.route("/notes", methods=["POST"])
+def generate_notes():
+    """Generate structured notes from video transcript."""
+    try:
+        data = request.get_json()
+
+        if not data:
+            return (
+                jsonify(
+                    {
+                        "notes": "",
+                        "video_id": "",
+                        "success": False,
+                        "error": "No JSON data provided",
+                    }
+                ),
+                400,
+            )
+
+        video_id = data.get("video_id", "")
+        format_type = data.get("format", "markdown")  # markdown or text
+        detail_level = data.get("detail_level", "standard")  # brief, standard, detailed
+        include_timestamps = data.get("include_timestamps", True)
+        include_diagrams = data.get("include_diagrams", True)
+        regenerate = data.get("regenerate", False)
+
+        logger.info(f"Notes generation request for video {video_id} (format: {format_type}, level: {detail_level})")
+
+        # Validate video ID
+        if not video_id or len(video_id) != 11:
+            return (
+                jsonify(
+                    {
+                        "notes": "",
+                        "video_id": video_id,
+                        "success": False,
+                        "error": "Invalid YouTube video ID format",
+                    }
+                ),
+                400,
+            )
+
+        # Check cache first (unless regenerate is requested)
+        if not regenerate:
+            cached_notes = rag_engine.get_cached_notes(video_id, format_type, detail_level)
+            if cached_notes:
+                logger.info(f"Returning cached notes for {video_id}")
+                return jsonify(
+                    {
+                        "notes": cached_notes,
+                        "video_id": video_id,
+                        "success": True,
+                        "cached": True,
+                        "format": format_type,
+                        "detail_level": detail_level
+                    }
+                )
+
+        # Load video and get chunks with embeddings
+        chunks, embeddings = rag_engine.get_chunks_and_embeddings(video_id)
+
+        if not chunks:
+            return (
+                jsonify(
+                    {
+                        "notes": "",
+                        "video_id": video_id,
+                        "success": False,
+                        "error": "This video doesn't have captions/transcripts available. Please try a different video with subtitles enabled.",
+                    }
+                ),
+                404,
+            )
+
+        # Generate notes
+        result = notes_generator.generate_notes(
+            video_id=video_id,
+            chunks=chunks,
+            embeddings=embeddings,
+            format_type=format_type,
+            detail_level=detail_level,
+            include_timestamps=include_timestamps,
+            include_diagrams=include_diagrams
+        )
+
+        if not result["success"]:
+            return jsonify(
+                {
+                    "notes": "",
+                    "video_id": video_id,
+                    "success": False,
+                    "error": result.get("error", "Failed to generate notes"),
+                }
+            )
+
+        # Cache the generated notes
+        rag_engine.cache_notes(video_id, format_type, detail_level, result["notes"])
+
+        return jsonify(
+            {
+                "notes": result["notes"],
+                "video_id": video_id,
+                "success": True,
+                "cached": False,
+                "metadata": result["metadata"],
+                "format": format_type,
+                "detail_level": detail_level
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error in notes endpoint: {str(e)}")
+        return (
+            jsonify(
+                {
+                    "notes": "",
+                    "video_id": data.get("video_id", "") if "data" in locals() else "",
+                    "success": False,
+                    "error": str(e),
+                }
+            ),
+            500,
         )
 
 

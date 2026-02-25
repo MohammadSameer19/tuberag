@@ -1,0 +1,285 @@
+.notes-viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: white;
+  overflow-y: auto;
+}
+
+.welcome-section {
+  padding: 20px;
+  text-align: center;
+}
+
+.welcome-content h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.welcome-content p {
+  margin: 0 0 20px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.options-section {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.option-group {
+  margin-bottom: 12px;
+}
+
+.option-group:last-child {
+  margin-bottom: 0;
+}
+
+.option-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.option-group select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+}
+
+.option-group.checkbox {
+  margin-top: 12px;
+}
+
+.option-group.checkbox label {
+  display: flex;
+  align-items: center;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.option-group.checkbox input {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.generate-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.generate-button.primary {
+  background: #1976d2;
+  color: white;
+}
+
+.generate-button.primary:hover:not(:disabled) {
+  background: #1565c0;
+}
+
+.generate-button.secondary {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.generate-button.secondary:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.generate-button.small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.generate-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #1976d2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-section p {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.loading-section small {
+  font-size: 12px;
+  color: #999;
+}
+
+.error-section {
+  padding: 20px;
+  text-align: center;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.notes-results {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.notes-header {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f9f9f9;
+}
+
+.notes-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.cached-badge {
+  display: inline-block;
+  background: #4caf50;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  margin-left: 8px;
+  font-weight: 600;
+}
+
+.metadata {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.metadata span {
+  margin-right: 4px;
+}
+
+.notes-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.action-button {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #333;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-button:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #1976d2;
+  color: #1976d2;
+}
+
+.action-button.secondary {
+  background: #f5f5f5;
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notes-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: #fafafa;
+}
+
+.notes-content pre {
+  margin: 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: #333;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.notes-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #e0e0e0;
+  background: #f9f9f9;
+}
+
+.format-options {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.format-options label {
+  color: #666;
+  font-weight: 600;
+}
+
+.format-options select {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  background: white;
+  cursor: pointer;
+}
+
+.format-options button {
+  margin-left: auto;
+}

@@ -35,6 +35,9 @@ class ChromaDBVideoRAG:
         
         # Conversation history for context memory
         self.conversation_history = {}
+        
+        # Notes cache for generated notes
+        self.notes_cache = {}
 
     def _get_embedding(self, text: str) -> List[float]:
         """Get embedding for text using local sentence-transformers."""
@@ -280,3 +283,51 @@ If the information is not available in the transcript, please say so."""
         except Exception as e:
             logger.error(f"Error listing videos: {str(e)}")
             return []
+
+    def get_chunks_and_embeddings(self, video_id: str) -> tuple:
+        """
+        Get all chunks and their embeddings for a video.
+        Returns (chunks, embeddings) tuple.
+        """
+        try:
+            # Load video if not already loaded
+            if not self.load_video(video_id):
+                return ([], [])
+            
+            # Get all documents and embeddings from collection
+            results = self.current_collection.get(
+                include=["documents", "embeddings"]
+            )
+            
+            chunks = results.get("documents", [])
+            embeddings = results.get("embeddings", [])
+            
+            logger.info(f"Retrieved {len(chunks)} chunks with embeddings for video {video_id}")
+            return (chunks, embeddings)
+            
+        except Exception as e:
+            logger.error(f"Error getting chunks and embeddings: {str(e)}")
+            return ([], [])
+
+    def cache_notes(self, video_id: str, format_type: str, detail_level: str, notes: str):
+        """Cache generated notes for a video."""
+        cache_key = f"{video_id}_{format_type}_{detail_level}"
+        self.notes_cache[cache_key] = {
+            "notes": notes,
+            "cached_at": self._get_timestamp()
+        }
+        logger.info(f"Cached notes for {cache_key}")
+
+    def get_cached_notes(self, video_id: str, format_type: str, detail_level: str) -> Optional[str]:
+        """Retrieve cached notes if available."""
+        cache_key = f"{video_id}_{format_type}_{detail_level}"
+        cached = self.notes_cache.get(cache_key)
+        if cached:
+            logger.info(f"Retrieved cached notes for {cache_key}")
+            return cached["notes"]
+        return None
+
+    def _get_timestamp(self) -> str:
+        """Get current timestamp."""
+        from datetime import datetime
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")

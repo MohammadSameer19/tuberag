@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import ChatWindow from './components/ChatWindow';
 import SentimentCard from './components/SentimentCard';
 import EmbeddingsViewer from './components/EmbeddingsViewer';
+import NotesViewer from './components/NotesViewer';
 
 const API_BASE_URL = 'http://localhost:8000';
 
@@ -15,6 +16,7 @@ function App() {
   const [chatMessages, setChatMessages] = useState([]);
   const [sentimentAnalysis, setSentimentAnalysis] = useState(null);
   const [embeddingsData, setEmbeddingsData] = useState(null);
+  const [notesData, setNotesData] = useState(null);
 
   useEffect(() => {
     const getCurrentVideoId = async () => {
@@ -36,6 +38,7 @@ function App() {
                 setChatMessages([]);
                 setSentimentAnalysis(null);
                 setEmbeddingsData(null);
+                setNotesData(null);
               }
               setVideoId(response.videoId);
               setError(null);
@@ -65,6 +68,7 @@ function App() {
           setChatMessages([]);
           setSentimentAnalysis(null);
           setEmbeddingsData(null);
+          setNotesData(null);
         }
         setVideoId(message.videoId);
         setError(null);
@@ -109,6 +113,15 @@ function App() {
     />
   ), [videoId, embeddingsData]);
 
+  const notesViewer = useMemo(() => (
+    <NotesViewer 
+      videoId={videoId} 
+      apiBaseUrl={API_BASE_URL}
+      notes={notesData}
+      setNotes={setNotesData}
+    />
+  ), [videoId, notesData]);
+
   return (
     <div className="app">
       <div className="header">
@@ -139,6 +152,12 @@ function App() {
               📊 Sentiment
             </button>
             <button
+              className={`tab ${activeTab === 'notes' ? 'active' : ''}`}
+              onClick={() => setActiveTab('notes')}
+            >
+              📝 Notes
+            </button>
+            <button
               className={`tab ${activeTab === 'embeddings' ? 'active' : ''}`}
               onClick={() => setActiveTab('embeddings')}
             >
@@ -152,6 +171,9 @@ function App() {
             </div>
             <div style={{ display: activeTab === 'sentiment' ? 'flex' : 'none', flexDirection: 'column', height: '100%' }}>
               {sentimentCard}
+            </div>
+            <div style={{ display: activeTab === 'notes' ? 'flex' : 'none', flexDirection: 'column', height: '100%' }}>
+              {notesViewer}
             </div>
             <div style={{ display: activeTab === 'embeddings' ? 'flex' : 'none', flexDirection: 'column', height: '100%' }}>
               {embeddingsViewer}
