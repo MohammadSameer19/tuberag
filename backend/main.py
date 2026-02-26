@@ -138,6 +138,58 @@ def debug_video(video_id):
         })
 
 
+@app.route("/videos/<video_id>/transcript", methods=["GET"])
+def get_transcript(video_id):
+    """Get the full transcript for a video."""
+    try:
+        collection_name = f"video_{video_id.replace('-', '_')}"
+        
+        try:
+            collection = rag_engine.client.get_collection(name=collection_name)
+        except Exception:
+            return jsonify({
+                "video_id": video_id,
+                "transcript": "",
+                "error": "Video not found in database. Please chat with the video first to load the transcript.",
+                "success": False
+            })
+        
+        # Get all documents (chunks)
+        count = collection.count()
+        if count == 0:
+            return jsonify({
+                "video_id": video_id,
+                "transcript": "",
+                "error": "No transcript chunks found for this video.",
+                "success": False
+            })
+        
+        # Fetch all chunks
+        all_data = collection.get(
+            limit=count,
+            include=["documents"]
+        )
+        
+        # Combine all chunks into full transcript
+        transcript = "\n\n".join(all_data["documents"])
+        
+        return jsonify({
+            "video_id": video_id,
+            "transcript": transcript,
+            "chunk_count": count,
+            "success": True
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching transcript: {str(e)}")
+        return jsonify({
+            "video_id": video_id,
+            "transcript": "",
+            "error": str(e),
+            "success": False
+        })
+
+
 @app.route("/videos/<video_id>", methods=["DELETE"])
 def delete_video(video_id):
     """Delete a video from ChromaDB."""
@@ -365,7 +417,6 @@ def generate_notes():
         format_type = data.get("format", "markdown")  # markdown or text
         detail_level = data.get("detail_level", "standard")  # brief, standard, detailed
         include_timestamps = data.get("include_timestamps", True)
-        include_diagrams = data.get("include_diagrams", True)
         regenerate = data.get("regenerate", False)
 
         logger.info(f"Notes generation request for video {video_id} (format: {format_type}, level: {detail_level})")
@@ -386,17 +437,25 @@ def generate_notes():
 
         # Check cache first (unless regenerate is requested)
         if not regenerate:
-            cached_notes = rag_engine.get_cached_notes(video_id, format_type, detail_level)
-            if cached_notes:
-                logger.info(f"Returning cached notes for {video_id}")
+            cached_topics = rag_engine.get_cached_notes(video_id, detail_level)
+            if cached_topics:
+                logger.info(f"Using cached topics for {video_id}, formatting as {format_type}")
+                # Format cached topics in requested format
+                formatted_notes = notes_generator.format_notes(
+                    topics=cached_topics,
+                    video_id=video_id,
+                    format_type=format_type,
+                    include_timestamps=include_timestamps
+                )
                 return jsonify(
                     {
-                        "notes": cached_notes,
+                        "notes": formatted_notes,
                         "video_id": video_id,
                         "success": True,
                         "cached": True,
                         "format": format_type,
-                        "detail_level": detail_level
+                        "detail_level": detail_level,
+                        "topics_count": len(cached_topics)
                     }
                 )
 
@@ -416,15 +475,14 @@ def generate_notes():
                 404,
             )
 
-        # Generate notes
+        # Generate topics (LLM call)
         result = notes_generator.generate_notes(
             video_id=video_id,
             chunks=chunks,
             embeddings=embeddings,
             format_type=format_type,
             detail_level=detail_level,
-            include_timestamps=include_timestamps,
-            include_diagrams=include_diagrams
+            include_timestamps=include_timestamps
         )
 
         if not result["success"]:
@@ -437,8 +495,8 @@ def generate_notes():
                 }
             )
 
-        # Cache the generated notes
-        rag_engine.cache_notes(video_id, format_type, detail_level, result["notes"])
+        # Cache the topics (not the formatted notes)
+        rag_engine.cache_notes(video_id, detail_level, result["topics"])
 
         return jsonify(
             {

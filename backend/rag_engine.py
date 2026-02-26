@@ -309,22 +309,22 @@ If the information is not available in the transcript, please say so."""
             logger.error(f"Error getting chunks and embeddings: {str(e)}")
             return ([], [])
 
-    def cache_notes(self, video_id: str, format_type: str, detail_level: str, notes: str):
-        """Cache generated notes for a video."""
-        cache_key = f"{video_id}_{format_type}_{detail_level}"
+    def cache_notes(self, video_id: str, detail_level: str, topics: List[Dict]):
+        """Cache generated topics for a video (format-agnostic)."""
+        cache_key = f"{video_id}_{detail_level}"
         self.notes_cache[cache_key] = {
-            "notes": notes,
+            "topics": topics,
             "cached_at": self._get_timestamp()
         }
-        logger.info(f"Cached notes for {cache_key}")
+        logger.info(f"Cached topics for {cache_key}")
 
-    def get_cached_notes(self, video_id: str, format_type: str, detail_level: str) -> Optional[str]:
-        """Retrieve cached notes if available."""
-        cache_key = f"{video_id}_{format_type}_{detail_level}"
+    def get_cached_notes(self, video_id: str, detail_level: str) -> Optional[List[Dict]]:
+        """Retrieve cached topics if available."""
+        cache_key = f"{video_id}_{detail_level}"
         cached = self.notes_cache.get(cache_key)
         if cached:
-            logger.info(f"Retrieved cached notes for {cache_key}")
-            return cached["notes"]
+            logger.info(f"Retrieved cached topics for {cache_key}")
+            return cached["topics"]
         return None
 
     def _get_timestamp(self) -> str:

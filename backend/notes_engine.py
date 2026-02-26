@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 class NotesGenerator:
     """
     Generate structured notes from video transcripts using semantic clustering.
-    Includes ASCII diagrams for visual representation.
     """
 
     def __init__(self, perplexity_api_key: str):
@@ -192,99 +191,28 @@ Focus on explaining WHY and HOW things work, not just listing WHAT happened. Mak
                 "chunk_count": len(chunks)
             }
 
-    def generate_ascii_diagram(self, topics: List[Dict[str, str]]) -> str:
-        """
-        Generate ASCII diagram showing video structure and topics.
-        """
-        diagram = []
-        diagram.append("```")
-        diagram.append("VIDEO STRUCTURE")
-        diagram.append("=" * 60)
-        diagram.append("")
-        
-        # Timeline representation
-        total_topics = len(topics)
-        timeline = "Timeline: "
-        for i in range(total_topics):
-            timeline += f"[T{i+1}]"
-            if i < total_topics - 1:
-                timeline += "──"
-        diagram.append(timeline)
-        diagram.append("")
-        
-        # Topic hierarchy
-        diagram.append("Topic Hierarchy:")
-        diagram.append("│")
-        for i, topic in enumerate(topics):
-            is_last = i == len(topics) - 1
-            prefix = "└──" if is_last else "├──"
-            diagram.append(f"{prefix} {topic['title']}")
-            
-            # Add key points count
-            points_count = len(topic.get('key_points', []))
-            chunk_count = topic.get('chunk_count', 0)
-            if not is_last:
-                diagram.append(f"│   └─ {points_count} key points, {chunk_count} segments")
-            else:
-                diagram.append(f"    └─ {points_count} key points, {chunk_count} segments")
-        
-        diagram.append("")
-        diagram.append("=" * 60)
-        diagram.append("```")
-        
-        return "\n".join(diagram)
-
-    def generate_flow_diagram(self, topics: List[Dict[str, str]]) -> str:
-        """
-        Generate ASCII flow diagram showing content progression.
-        """
-        diagram = []
-        diagram.append("```")
-        diagram.append("CONTENT FLOW")
-        diagram.append("")
-        
-        for i, topic in enumerate(topics):
-            # Topic box
-            title = topic['title'][:40]  # Truncate long titles
-            box_width = max(len(title) + 4, 30)
-            
-            diagram.append("┌" + "─" * (box_width - 2) + "┐")
-            diagram.append(f"│ {title.center(box_width - 4)} │")
-            diagram.append("└" + "─" * (box_width - 2) + "┘")
-            
-            # Arrow to next topic
-            if i < len(topics) - 1:
-                diagram.append("    │")
-                diagram.append("    ▼")
-                diagram.append("")
-        
-        diagram.append("```")
-        return "\n".join(diagram)
-
     def format_notes(
         self, 
         topics: List[Dict[str, str]], 
         video_id: str,
         format_type: str = "markdown",
-        include_timestamps: bool = True,
-        include_diagrams: bool = True
+        include_timestamps: bool = True
     ) -> str:
         """
-        Format topic summaries into final notes with ASCII diagrams.
+        Format topic summaries into final notes.
         """
         if format_type == "markdown":
-            return self._format_markdown(topics, video_id, include_timestamps, include_diagrams)
+            return self._format_markdown(topics, video_id, include_timestamps)
         elif format_type == "text":
-            return self._format_text(topics, video_id, include_timestamps, include_diagrams)
+            return self._format_text(topics, video_id, include_timestamps)
         else:
-            return self._format_markdown(topics, video_id, include_timestamps, include_diagrams)
+            return self._format_markdown(topics, video_id, include_timestamps)
 
     def _format_markdown(
         self, 
         topics: List[Dict[str, str]], 
         video_id: str,
-        include_timestamps: bool,
-        include_diagrams: bool
+        include_timestamps: bool
     ) -> str:
         """Format notes as Markdown."""
         lines = []
@@ -297,17 +225,6 @@ Focus on explaining WHY and HOW things work, not just listing WHAT happened. Mak
         lines.append("")
         lines.append("---")
         lines.append("")
-        
-        # ASCII Diagrams
-        if include_diagrams:
-            lines.append("## 📊 Video Structure")
-            lines.append("")
-            lines.append(self.generate_ascii_diagram(topics))
-            lines.append("")
-            lines.append(self.generate_flow_diagram(topics))
-            lines.append("")
-            lines.append("---")
-            lines.append("")
         
         # Table of Contents
         lines.append("## 📑 Table of Contents")
@@ -354,8 +271,7 @@ Focus on explaining WHY and HOW things work, not just listing WHAT happened. Mak
         self, 
         topics: List[Dict[str, str]], 
         video_id: str,
-        include_timestamps: bool,
-        include_diagrams: bool
+        include_timestamps: bool
     ) -> str:
         """Format notes as plain text."""
         lines = []
@@ -368,17 +284,6 @@ Focus on explaining WHY and HOW things work, not just listing WHAT happened. Mak
         lines.append(f"Generated: {self._get_timestamp()}")
         lines.append(f"Topics Covered: {len(topics)}")
         lines.append("")
-        
-        # ASCII Diagrams
-        if include_diagrams:
-            lines.append("-" * 60)
-            lines.append("VIDEO STRUCTURE")
-            lines.append("-" * 60)
-            lines.append("")
-            lines.append(self.generate_ascii_diagram(topics))
-            lines.append("")
-            lines.append(self.generate_flow_diagram(topics))
-            lines.append("")
         
         # Detailed Notes
         lines.append("-" * 60)
@@ -422,8 +327,7 @@ Focus on explaining WHY and HOW things work, not just listing WHAT happened. Mak
         embeddings: List[List[float]],
         format_type: str = "markdown",
         detail_level: str = "standard",
-        include_timestamps: bool = True,
-        include_diagrams: bool = True
+        include_timestamps: bool = True
     ) -> Dict[str, any]:
         """
         Main method to generate notes from video chunks.
@@ -435,7 +339,6 @@ Focus on explaining WHY and HOW things work, not just listing WHAT happened. Mak
             format_type: "markdown" or "text"
             detail_level: "brief", "standard", or "detailed"
             include_timestamps: Include timestamp information
-            include_diagrams: Include ASCII diagrams
             
         Returns:
             Dict with notes content and metadata
@@ -466,8 +369,7 @@ Focus on explaining WHY and HOW things work, not just listing WHAT happened. Mak
                 topics, 
                 video_id, 
                 format_type,
-                include_timestamps,
-                include_diagrams
+                include_timestamps
             )
             
             # Step 4: Generate metadata
@@ -478,7 +380,6 @@ Focus on explaining WHY and HOW things work, not just listing WHAT happened. Mak
                 "topics_count": len(topics),
                 "chunks_processed": len(chunks),
                 "generated_at": self._get_timestamp(),
-                "includes_diagrams": include_diagrams,
                 "includes_timestamps": include_timestamps
             }
             

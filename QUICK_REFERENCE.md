@@ -21,7 +21,7 @@ npm run build
 |---------|-----|-------------|
 | Chat | 💬 | Ask questions about video content |
 | Sentiment | 📊 | Analyze viewer opinions from comments |
-| Notes | 📝 | Generate structured notes with diagrams |
+| Notes | 📝 | Generate structured notes |
 | Embeddings | 🔍 | Inspect stored vector data |
 
 ## API Endpoints
@@ -51,7 +51,6 @@ POST /notes
   "video_id": "VIDEO_ID",
   "format": "markdown",          # or "text"
   "detail_level": "standard",    # "brief", "standard", "detailed"
-  "include_diagrams": true,
   "regenerate": false
 }
 ```
@@ -67,14 +66,10 @@ POST /notes
 - **Standard**: 5-8 topics, balanced detail
 - **Detailed**: 8-10 topics, comprehensive
 
-### ASCII Diagrams
-- Video Structure: Timeline + hierarchy
-- Content Flow: Visual progression
-
 ### Token Savings
 - First generation: 70% savings
 - Cached requests: 99% savings
-- Average: 85-90% savings
+- Format switching: 0 tokens (instant)
 
 ## Usage Examples
 
@@ -96,8 +91,7 @@ curl -X POST http://localhost:8000/notes \
   -d '{
     "video_id": "dQw4w9WgXcQ",
     "format": "text",
-    "detail_level": "detailed",
-    "include_diagrams": true
+    "detail_level": "detailed"
   }'
 ```
 

@@ -23,7 +23,6 @@ Analyze what viewers think about the video by processing YouTube comments. Get i
 ### 📝 Key Notes Generator
 Generate structured, educational notes from video transcripts with:
 - **Semantic Clustering**: Groups related content into topics
-- **ASCII Diagrams**: Visual representation of video structure and content flow
 - **Multiple Formats**: Markdown (.md) or Plain Text (.txt)
 - **Detail Levels**: Brief (2-3 topics), Standard (5-8 topics), Detailed (8-10 topics)
 - **Smart Caching**: 70-99% token savings on repeated requests
@@ -51,7 +50,7 @@ Works with 50+ languages using multilingual sentence transformers
 
 ### Backend (Python + Flask)
 - **RAG Engine** (`rag_engine.py`): ChromaDB vector storage + Perplexity AI for generation
-- **Notes Generator** (`notes_engine.py`): Semantic clustering + AI summarization with ASCII diagrams
+- **Notes Generator** (`notes_engine.py`): Semantic clustering + AI summarization
 - **Sentiment Analyzer** (`sentiment_engine.py`): YouTube comment analysis
 - **Transcript Extractor** (`manual_transcript.py`): Fetches video captions/subtitles
 - **API Server** (`main.py`): Flask REST API with CORS support
@@ -164,12 +163,9 @@ You should see:
 #### 📝 Notes Tab
 - Select format: Markdown or Plain Text
 - Choose detail level: Brief, Standard, or Detailed
-- Toggle ASCII diagrams on/off
 - Click "Generate Notes"
 - Download or copy to clipboard
 - Notes include:
-  - Video structure diagram
-  - Content flow visualization
   - Topic summaries with key points
   - Table of contents
 
@@ -230,7 +226,7 @@ The Notes Generator uses **semantic clustering** to dramatically reduce token us
 2. **Cluster by Topic**: Use K-means on embeddings to group related content
 3. **Select Representatives**: Pick chunks from beginning, middle, and end of each cluster
 4. **Summarize**: AI generates explanatory notes for each topic cluster
-5. **Format**: Create structured notes with ASCII diagrams
+5. **Format**: Create structured notes
 6. **Cache**: Store results for instant retrieval
 
 ### Detail Levels
@@ -239,33 +235,13 @@ The Notes Generator uses **semantic clustering** to dramatically reduce token us
 - **Standard**: 5-8 topics, balanced detail (8-12 seconds)
 - **Detailed**: 8-10 topics, comprehensive coverage (12-18 seconds)
 
-### ASCII Diagrams
+### Key Benefits
 
-**Video Structure Diagram:**
-```
-Timeline: [T1]──[T2]──[T3]──[T4]
-
-Topic Hierarchy:
-│
-├── Introduction
-│   └─ 4 key points, 8 segments
-├── Main Content
-│   └─ 6 key points, 12 segments
-└── Conclusion
-    └─ 3 key points, 5 segments
-```
-
-**Content Flow Diagram:**
-```
-┌────────────────────────────┐
-│      Introduction          │
-└────────────────────────────┘
-    │
-    ▼
-┌────────────────────────────┐
-│      Main Content          │
-└────────────────────────────┘
-```
+✅ **70-99% token savings** - Clustering reduces tokens dramatically
+✅ **Smart caching** - Instant retrieval on subsequent requests
+✅ **Accurate representation** - Based on actual content distribution
+✅ **Multiple formats** - Markdown or plain text
+✅ **GitHub-ready** - Renders automatically in README files and GitHub
 
 ## 🔌 API Endpoints
 
@@ -334,7 +310,6 @@ Generate structured notes from video transcript.
 - `format`: "markdown" or "text"
 - `detail_level`: "brief", "standard", or "detailed"
 - `include_timestamps`: true/false
-- `include_diagrams`: true/false (ASCII diagrams)
 - `regenerate`: true/false (bypass cache)
 
 **Response:**
@@ -675,7 +650,7 @@ Need help? Here's how to get support:
 - [ ] **Offline mode**: Cache videos for offline access
 
 ### Recently Completed
-- [x] Key Notes Generator with ASCII diagrams
+- [x] Key Notes Generator with semantic clustering
 - [x] Semantic clustering for token optimization
 - [x] Context memory for conversations
 - [x] Sentiment analysis from comments

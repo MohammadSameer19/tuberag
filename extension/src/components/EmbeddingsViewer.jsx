@@ -4,6 +4,7 @@ import './EmbeddingsViewer.css';
 function EmbeddingsViewer({ videoId, apiBaseUrl, embeddings, setEmbeddings }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [copyingSubtitles, setCopyingSubtitles] = useState(false);
 
   const fetchEmbeddings = async () => {
     setLoading(true);
@@ -28,6 +29,33 @@ function EmbeddingsViewer({ videoId, apiBaseUrl, embeddings, setEmbeddings }) {
       setError('Failed to fetch embeddings. Make sure the backend server is running.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const copySubtitles = async () => {
+    setCopyingSubtitles(true);
+    try {
+      // Fetch full transcript from backend
+      const response = await fetch(`${apiBaseUrl}/videos/${videoId}/transcript`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.transcript) {
+        // Copy to clipboard
+        await navigator.clipboard.writeText(data.transcript);
+        alert('✅ Subtitles copied to clipboard!');
+      } else {
+        alert('❌ Failed to fetch subtitles: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Error copying subtitles:', err);
+      alert('❌ Failed to copy subtitles. Make sure the backend server is running.');
+    } finally {
+      setCopyingSubtitles(false);
     }
   };
 
@@ -143,6 +171,14 @@ function EmbeddingsViewer({ videoId, apiBaseUrl, embeddings, setEmbeddings }) {
           <div className="actions-section">
             <button className="inspect-button secondary" onClick={fetchEmbeddings} disabled={loading}>
               🔄 Refresh Data
+            </button>
+            <button 
+              className="inspect-button primary" 
+              onClick={copySubtitles} 
+              disabled={copyingSubtitles}
+              style={{ marginLeft: '10px' }}
+            >
+              {copyingSubtitles ? '⏳ Copying...' : '📋 Copy Subtitles'}
             </button>
           </div>
         </div>

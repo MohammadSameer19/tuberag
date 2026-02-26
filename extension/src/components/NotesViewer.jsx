@@ -6,7 +6,6 @@ function NotesViewer({ videoId, apiBaseUrl, notes, setNotes }) {
   const [error, setError] = useState(null);
   const [format, setFormat] = useState('markdown');
   const [detailLevel, setDetailLevel] = useState('standard');
-  const [includeDiagrams, setIncludeDiagrams] = useState(true);
 
   const generateNotes = async (regenerate = false) => {
     setLoading(true);
@@ -23,7 +22,6 @@ function NotesViewer({ videoId, apiBaseUrl, notes, setNotes }) {
           format: format,
           detail_level: detailLevel,
           include_timestamps: true,
-          include_diagrams: includeDiagrams,
           regenerate: regenerate
         })
       });
@@ -85,7 +83,7 @@ function NotesViewer({ videoId, apiBaseUrl, notes, setNotes }) {
         <div className="welcome-section">
           <div className="welcome-content">
             <h3>📝 Key Notes Generator</h3>
-            <p>Generate structured notes with ASCII diagrams from this video's content.</p>
+            <p>Generate structured notes from this video's content.</p>
             
             <div className="options-section">
               <div className="option-group">
@@ -103,17 +101,6 @@ function NotesViewer({ videoId, apiBaseUrl, notes, setNotes }) {
                   <option value="standard">Standard (5-8 topics)</option>
                   <option value="detailed">Detailed (8-10 topics)</option>
                 </select>
-              </div>
-
-              <div className="option-group checkbox">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={includeDiagrams}
-                    onChange={(e) => setIncludeDiagrams(e.target.checked)}
-                  />
-                  Include ASCII Diagrams
-                </label>
               </div>
             </div>
 
