@@ -349,10 +349,14 @@ Focus on explaining WHY and HOW things work, not just listing WHAT happened. Mak
             # Determine number of clusters based on detail level
             n_clusters = None
             if detail_level == "brief":
-                n_clusters = min(3, len(chunks) // 15)
+                n_clusters = max(1, min(3, len(chunks) // 15 or 2))
             elif detail_level == "detailed":
-                n_clusters = min(10, len(chunks) // 5)
+                n_clusters = max(1, min(10, len(chunks) // 5 or 5))
             # standard uses auto-detection
+            
+            # Ensure n_clusters doesn't exceed number of chunks
+            if n_clusters is not None:
+                n_clusters = min(n_clusters, len(chunks))
             
             # Step 1: Cluster chunks by topic
             clusters = self.cluster_chunks(chunks, embeddings, n_clusters)
