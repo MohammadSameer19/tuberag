@@ -633,30 +633,6 @@ Need help? Here's how to get support:
 - **Discussions**: Check existing issues for solutions
 - **Documentation**: Read `CONTEXT_MEMORY.md` and `NOTES_FEATURE.md`
 
-## 🗺️ Roadmap
-
-### Planned Features
-- [ ] **Persistent context memory**: Store conversation history in database
-- [ ] **Multi-video comparison**: Compare content across multiple videos
-- [ ] **Export chat history**: Download conversations as PDF/Markdown
-- [ ] **Custom AI models**: Support for different LLM providers
-- [ ] **Timestamp navigation**: Click timestamps to jump to video position
-- [ ] **Video summarization**: Generate executive summaries
-- [ ] **Collaborative notes**: Share and edit notes with others
-- [ ] **PDF export**: Export notes as formatted PDF documents
-- [ ] **Mind maps**: Visual mind map generation from notes
-- [ ] **Action items**: Extract actionable steps from videos
-- [ ] **Playlist support**: Process entire YouTube playlists
-- [ ] **Offline mode**: Cache videos for offline access
-
-### Recently Completed
-- [x] Key Notes Generator with semantic clustering
-- [x] Semantic clustering for token optimization
-- [x] Context memory for conversations
-- [x] Sentiment analysis from comments
-- [x] ChromaDB persistent storage
-- [x] Multilingual support
-
 ## 📊 Performance Metrics
 
 ### Token Usage (30-min video)
