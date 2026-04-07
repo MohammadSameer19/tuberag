@@ -2,6 +2,12 @@
 
 A powerful Chrome extension that transforms how you interact with YouTube videos. Chat with video content, analyze viewer sentiment, and generate structured notes - all powered by AI and RAG (Retrieval-Augmented Generation).
 
+[![GitHub](https://img.shields.io/badge/GitHub-TubeRAG-blue?logo=github)](https://github.com/MohammadSameer19/TubeRAG)
+[![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python)](https://www.python.org/)
+[![React](https://img.shields.io/badge/React-18-blue?logo=react)](https://reactjs.org/)
+[![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector%20DB-orange)](https://www.trychroma.com/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
 ## ✨ Features
 
 ### 💬 Chat with Videos
@@ -67,7 +73,8 @@ Works with 50+ languages using multilingual sentence transformers
 - **Python 3.8+** (for backend server)
 - **Node.js 16+** (for building extension)
 - **Chrome Browser** (for running extension)
-- **Perplexity API Key** ([Get one here](https://www.perplexity.ai/))
+- **GitHub Models API Key** ([Get from GitHub Settings](https://github.com/settings/tokens)) - Requires GitHub Copilot Pro
+- **OR Perplexity API Key** ([Get one here](https://www.perplexity.ai/)) - Alternative LLM provider
 
 ## 🚀 Installation
 
@@ -97,7 +104,16 @@ cp .env.example .env
 
 **Required in .env:**
 ```env
-PERPLEXITY_API_KEY=your_api_key_here
+# Choose your API provider
+API_PROVIDER=github  # or "perplexity"
+
+# GitHub Models API Key (for Copilot Pro users)
+GITHUB_API_KEY=your_github_token_here
+
+# Perplexity API Key (alternative)
+PERPLEXITY_API_KEY=your_perplexity_key_here
+
+# ChromaDB storage location
 CHROMA_PERSIST_DIR=./chroma_db
 ```
 
@@ -398,8 +414,7 @@ tuberag/
 │   └── package.json            # Node dependencies
 │
 ├── README.md                   # This file
-├── CONTEXT_MEMORY.md          # Context memory documentation
-├── NOTES_FEATURE.md           # Notes feature documentation
+├── QUICK_REFERENCE.md         # Quick command reference
 └── .gitignore                 # Git ignore rules
 ```
 
@@ -484,7 +499,16 @@ PERPLEXITY_API_KEY=your_api_key_here
 CHROMA_PERSIST_DIR=./chroma_db
 ```
 
-**Get Perplexity API Key:**
+**Get API Keys:**
+
+**Option 1: GitHub Models (Recommended for Students)**
+1. Visit [GitHub Settings → Tokens](https://github.com/settings/tokens)
+2. Click "Generate new token (classic)"
+3. Select "GitHub Models" scope
+4. Copy the token (starts with `ghp_`)
+5. Requires GitHub Copilot Pro subscription
+
+**Option 2: Perplexity API**
 1. Visit [perplexity.ai](https://www.perplexity.ai/)
 2. Sign up for an account
 3. Navigate to API settings
@@ -549,10 +573,12 @@ For production deployment, update this to your deployed backend URL.
 
 ### API Issues
 
-**Perplexity API errors**
+**API errors**
 - ✅ Verify API key is correct in `.env`
-- ✅ Check API quota/rate limits
+- ✅ Check `API_PROVIDER` setting matches your key type
+- ✅ Check API quota/rate limits (GitHub: 50-150 req/day)
 - ✅ Ensure API key has proper permissions
+- ✅ For GitHub: Verify Copilot Pro subscription is active
 
 **ChromaDB errors**
 - ✅ Delete `chroma_db/` folder and restart (will re-index videos)
@@ -574,10 +600,11 @@ For production deployment, update this to your deployed backend URL.
 ## 🛠️ Technologies Used
 
 ### Backend Stack
-- **Python 3.8+**: Core backend language
+- **Python 3.13**: Core backend language
 - **Flask**: REST API server with CORS support
-- **ChromaDB**: Vector database for persistent embeddings storage
-- **Perplexity AI**: LLM for generation (sonar-pro model)
+- **ChromaDB**: Vector database for persistent embeddings storage (HNSW algorithm)
+- **GitHub Models API**: LLM for generation (GPT-4o/GPT-4o mini)
+- **Perplexity AI**: Alternative LLM provider (sonar-pro model)
 - **sentence-transformers**: Multilingual embeddings (paraphrase-multilingual-MiniLM-L12-v2)
 - **scikit-learn**: K-means clustering for notes generation
 - **numpy**: Array operations and numerical computing
@@ -590,10 +617,11 @@ For production deployment, update this to your deployed backend URL.
 - **CSS3**: Styling with modern features
 
 ### Key Libraries
-- **chromadb**: Vector similarity search
+- **chromadb**: Vector similarity search with HNSW indexing
 - **requests**: HTTP client for API calls
 - **python-dotenv**: Environment variable management
 - **flask-cors**: Cross-origin resource sharing
+- **youtube-comment-downloader**: Comment extraction (no API key needed)
 
 ## 📄 License
 
@@ -619,8 +647,9 @@ Contributions are welcome! Here's how:
 
 ## 🙏 Acknowledgments
 
+- **GitHub Models** for providing free GPT-4o access to students
 - **Perplexity AI** for powerful LLM generation
-- **ChromaDB** for efficient vector storage
+- **ChromaDB** for efficient vector storage with HNSW
 - **sentence-transformers** for multilingual embeddings
 - **YouTube** for transcript API access
 - All contributors and users of TubeRAG
@@ -629,9 +658,10 @@ Contributions are welcome! Here's how:
 
 Need help? Here's how to get support:
 
-- **Issues**: [Open an issue on GitHub](https://github.com/yourusername/tuberag/issues)
+- **Issues**: [Open an issue on GitHub](https://github.com/MohammadSameer19/TubeRAG/issues)
 - **Discussions**: Check existing issues for solutions
-- **Documentation**: Read `CONTEXT_MEMORY.md` and `NOTES_FEATURE.md`
+- **Documentation**: Comprehensive guides in `Documentation/` folder
+- **Quick Reference**: See `QUICK_REFERENCE.md` for common commands
 
 ## 📊 Performance Metrics
 
@@ -639,17 +669,19 @@ Need help? Here's how to get support:
 - **Chat query**: ~500-1,000 tokens per question
 - **Sentiment analysis**: ~2,000-3,000 tokens
 - **Notes generation**: ~5,000 tokens (first time), 0 tokens (cached)
+- **Token savings**: 72.8% vs. traditional RAG (through K-means clustering)
 
 ### Response Times
-- **Chat**: 2-4 seconds
-- **Sentiment**: 8-12 seconds
-- **Notes (Brief)**: 5-8 seconds
-- **Notes (Standard)**: 8-12 seconds
-- **Notes (Detailed)**: 12-18 seconds
+- **Chat**: 5.89 seconds (average)
+- **Sentiment**: 8.48 seconds (average)
+- **Notes (Uncached)**: 26.84 seconds
+- **Notes (Cached)**: 2.07 seconds (13× faster!)
 
-### Storage
-- **Per video**: ~2-5 MB (embeddings + chunks)
-- **Cache**: In-memory (cleared on restart)
+### Storage Efficiency
+- **Per video**: ~500 KB (embeddings + chunks + HNSW index)
+- **Vector dimensions**: 384 (Sentence-BERT)
+- **Cache speedup**: 13× for format changes
+- **Database**: ChromaDB with HNSW algorithm (O(log N) search)
 
 ---
 
