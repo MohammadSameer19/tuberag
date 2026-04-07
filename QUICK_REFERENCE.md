@@ -1,227 +1,129 @@
 # TubeRAG - Quick Reference Guide
 
-## Installation
-
-```bash
-# Backend
-cd backend
-pip install -r requirements.txt
-python main.py
-
-# Extension
-cd extension
-npm install
-npm run build
-# Load extension/dist/ in Chrome
-```
-
-## Features
-
-| Feature | Tab | Description |
-|---------|-----|-------------|
-| Chat | 💬 | Ask questions about video content |
-| Sentiment | 📊 | Analyze viewer opinions from comments |
-| Notes | 📝 | Generate structured notes |
-| Embeddings | 🔍 | Inspect stored vector data |
-
-## API Endpoints
-
-### Chat
-```bash
-POST /chat
-{
-  "video_id": "VIDEO_ID",
-  "question": "Your question",
-  "clear_history": false
-}
-```
-
-### Sentiment Analysis
-```bash
-POST /analyze
-{
-  "video_id": "VIDEO_ID"
-}
-```
-
-### Generate Notes
-```bash
-POST /notes
-{
-  "video_id": "VIDEO_ID",
-  "format": "markdown",          # or "text"
-  "detail_level": "standard",    # "brief", "standard", "detailed"
-  "regenerate": false
-}
-```
-
-## Notes Feature
-
-### Formats
-- **Markdown** (.md): Rich formatting, headers, links
-- **Text** (.txt): Plain text, universal compatibility
-
-### Detail Levels
-- **Brief**: 2-3 topics, quick overview
-- **Standard**: 5-8 topics, balanced detail
-- **Detailed**: 8-10 topics, comprehensive
-
-### Token Savings
-- First generation: 70% savings
-- Cached requests: 99% savings
-- Format switching: 0 tokens (instant)
-
-## Usage Examples
-
-### Generate Brief Notes
-```bash
-curl -X POST http://localhost:8000/notes \
-  -H "Content-Type: application/json" \
-  -d '{
-    "video_id": "dQw4w9WgXcQ",
-    "format": "markdown",
-    "detail_level": "brief"
-  }'
-```
-
-### Generate Detailed Text Notes
-```bash
-curl -X POST http://localhost:8000/notes \
-  -H "Content-Type: application/json" \
-  -d '{
-    "video_id": "dQw4w9WgXcQ",
-    "format": "text",
-    "detail_level": "detailed"
-  }'
-```
-
-### Regenerate Notes (Bypass Cache)
-```bash
-curl -X POST http://localhost:8000/notes \
-  -H "Content-Type: application/json" \
-  -d '{
-    "video_id": "dQw4w9WgXcQ",
-    "format": "markdown",
-    "detail_level": "standard",
-    "regenerate": true
-  }'
-```
-
-## Troubleshooting
-
-### Extension shows blank
-- Load `extension/dist/` folder, not root
-- Reload extension after building
-
-### Backend connection failed
-- Start backend: `python main.py`
-- Check port 8000 is available
-
-### No transcript available
-- Video must have captions enabled
-- Try a different video
-
-### Notes generation slow
-- Use "brief" detail level
-- First generation takes longer (caching)
-
-### Poor quality notes
-- Use "detailed" level
-- Ensure video has good transcript
-
-## File Locations
-
-```
-tuberag/
-├── backend/
-│   ├── main.py              # Flask server
-│   ├── rag_engine.py        # RAG + caching
-│   ├── notes_engine.py      # Notes generation
-│   ├── sentiment_engine.py  # Sentiment analysis
-│   └── requirements.txt     # Dependencies
-│
-├── extension/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── ChatWindow.jsx
-│   │   │   ├── SentimentCard.jsx
-│   │   │   ├── NotesViewer.jsx    # NEW
-│   │   │   └── EmbeddingsViewer.jsx
-│   │   └── App.jsx
-│   └── dist/                # Load this in Chrome
-│
-└── README.md
-```
-
-## Performance
-
-| Metric | Value |
-|--------|-------|
-| Notes generation | 5-18 seconds |
-| Token usage (30min) | ~5,000 tokens |
-| Cache hit rate | 80-90% |
-| Token savings | 70-99% |
-
-## Documentation
-
-- `README.md` - Main documentation
-- `NOTES_FEATURE.md` - Notes feature details
-- `CONTEXT_MEMORY.md` - Context memory explanation
-- `LOAD_EXTENSION.md` - Extension loading guide
-- `IMPLEMENTATION_SUMMARY.md` - Implementation details
-
-## Support
-
-**Issues?**
-1. Check backend is running
-2. Verify extension loaded from `dist/`
-3. Check browser console for errors
-4. Try different video with captions
-
-**Need Help?**
-- Open GitHub issue
-- Check documentation files
-- Review troubleshooting section
-
-## Quick Commands
-
-```bash
-# Start backend
-cd backend && python main.py
-
-# Build extension
-cd extension && npm run build
-
-# Test API
-curl http://localhost:8000/
-
-# Generate notes
-curl -X POST http://localhost:8000/notes \
-  -H "Content-Type: application/json" \
-  -d '{"video_id": "dQw4w9WgXcQ", "format": "markdown"}'
-```
-
-## Environment Variables
-
-```bash
-# backend/.env
-PERPLEXITY_API_KEY=your_api_key_here
-CHROMA_PERSIST_DIR=./chroma_db
-```
-
-## Browser Compatibility
-
-- ✅ Chrome (recommended)
-- ✅ Edge (Chromium-based)
-- ❌ Firefox (different extension API)
-- ❌ Safari (different extension API)
-
-## License
-
-MIT License - See LICENSE file
+**Version:** 1.1.1 | **Last Updated:** March 7, 2026
 
 ---
 
-**Version:** 1.1.0
-**Last Updated:** 2024-02-06
-**Status:** Production Ready
+## 🚀 Quick Start
+
+### Start Backend
+```bash
+cd tuberag/backend
+python main.py
+# Server runs on http://localhost:8000
+```
+
+### Load Extension
+1. Open `chrome://extensions/`
+2. Enable "Developer mode"
+3. Click "Load unpacked"
+4. Select `tuberag/extension` folder
+
+---
+
+## 📊 Features at a Glance
+
+| Feature | What it Does | Speed | Model |
+|---------|-------------|-------|-------|
+| **Chat** | Q&A with video | 5.89s | GPT-4o |
+| **Sentiment** | Analyze comments | 8.48s | GPT-4o mini |
+| **Notes** | Generate study notes | 26.84s / 2.07s* | GPT-4o |
+| **Embeddings** | View vectors | Instant | - |
+
+*Uncached / Cached
+
+---
+
+## 🔧 Configuration
+
+### API Setup (.env)
+```bash
+API_PROVIDER=github
+GITHUB_API_KEY=ghp_your_key_here
+CHROMA_PERSIST_DIR=./chroma_db
+```
+
+### Enable Timestamps
+```python
+# main.py, line 43
+include_timestamps=True
+```
+
+---
+
+## 📡 API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/` | GET | Health check |
+| `/chat` | POST | Ask questions |
+| `/analyze` | POST | Sentiment analysis |
+| `/notes` | POST | Generate notes |
+| `/videos` | GET | List videos |
+| `/videos/<id>` | DELETE | Delete video |
+
+---
+
+## 🎯 Key Metrics
+
+- **Token Savings:** 72.8%
+- **Cache Speedup:** 13×
+- **Embedding Dims:** 384
+- **Chunk Size:** 1000 chars
+- **Top-k Retrieval:** 4 chunks
+- **Success Rate:** 100%
+
+---
+
+## 🔍 Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| No transcript | Video needs captions |
+| 401 Error | Check API key in .env |
+| Connection refused | Start backend server |
+| Slow response | First load takes 15-30s |
+| Out of quota | Wait for daily reset |
+
+---
+
+## 📁 File Locations
+
+```
+backend/
+├── main.py          # API server
+├── rag_engine.py    # RAG logic
+├── notes_engine.py  # Notes generation
+├── sentiment_engine.py  # Sentiment analysis
+└── .env             # Configuration
+
+extension/
+├── src/App.jsx      # Main UI
+├── background.js    # Extension logic
+└── manifest.json    # Extension config
+```
+
+---
+
+## 💡 Pro Tips
+
+1. **First load is slow** - Subsequent requests are 13× faster
+2. **Use GPT-4o mini** for sentiment to save quota
+3. **Format changes are free** - Cached topics, 0 tokens
+4. **Clear history** - Use clear_history=true in /chat
+5. **Debug mode** - Use /videos/<id>/debug endpoint
+
+---
+
+## 📚 Full Documentation
+
+See `COMPLETE_TECHNICAL_DOCUMENTATION.md` for:
+- Detailed architecture
+- Algorithm explanations
+- API documentation
+- Performance optimizations
+- Deployment guides
+
+---
+
+**Need Help?** Check the full documentation or troubleshooting section.

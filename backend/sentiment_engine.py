@@ -13,27 +13,43 @@ class SentimentEngine:
     Uses youtube-comment-downloader to fetch comments (no API key needed).
     """
 
-    def __init__(self, perplexity_api_key: str):
-        self.perplexity_api_key = perplexity_api_key
-        self.perplexity_url = "https://api.perplexity.ai/chat/completions"
+    def __init__(self, api_key: str, api_provider: str = "github"):
+        self.api_key = api_key
+        self.api_provider = api_provider
         self.downloader = YoutubeCommentDownloader()
+        
+        # API endpoint based on provider - Use GPT-4o mini for sentiment (cheaper)
+        if api_provider == "github":
+            self.api_url = "https://models.github.ai/inference/chat/completions"
+            self.model = "openai/gpt-4o-mini"  # Use mini for sentiment analysis
+        else:  # perplexity
+            self.api_url = "https://api.perplexity.ai/chat/completions"
+            self.model = "sonar-pro"
 
     def _generate_content(self, prompt: str) -> str:
-        """Generate content using Perplexity API."""
+        """Generate content using GitHub Models or Perplexity API."""
         try:
-            headers = {
-                "Authorization": f"Bearer {self.perplexity_api_key}",
-                "Content-Type": "application/json"
-            }
+            if self.api_provider == "github":
+                headers = {
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                    "Accept": "application/vnd.github+json",
+                    "X-GitHub-Api-Version": "2022-11-28"
+                }
+            else:
+                headers = {
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json"
+                }
 
             payload = {
-                "model": "sonar-pro",
+                "model": self.model,
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.2,
                 "max_tokens": 2048,
             }
 
-            response = requests.post(self.perplexity_url, headers=headers, json=payload)
+            response = requests.post(self.api_url, headers=headers, json=payload)
             response.raise_for_status()
             data = response.json()
             return data["choices"][0]["message"]["content"]
@@ -134,19 +150,20 @@ Respond with ONLY the JSON object, no additional text."""
             }
 
 
-def analyze_video_sentiment(video_id: str, perplexity_api_key: str) -> Dict:
+def analyze_video_sentiment(video_id: str, api_key: str, api_provider: str = "github") -> Dict:
     """
     Main function to analyze video sentiment from comments.
 
     Args:
         video_id: YouTube video ID
-        perplexity_api_key: Perplexity API key for LLM
+        api_key: API key (GitHub or Perplexity)
+        api_provider: "github" or "perplexity"
 
     Returns:
         Dictionary containing sentiment analysis results
     """
     try:
-        engine = SentimentEngine(perplexity_api_key)
+        engine = SentimentEngine(api_key, api_provider)
 
         comments = engine._fetch_comments(video_id)
 

@@ -6,8 +6,16 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def get_transcript_new_api(video_id: str) -> Optional[str]:
-    """Fetch transcript using youtube-transcript-api."""
+def get_transcript_new_api(video_id: str, include_timestamps: bool = False) -> Optional[str]:
+    """Fetch transcript using youtube-transcript-api.
+    
+    Args:
+        video_id: YouTube video ID
+        include_timestamps: If True, includes [timestamp] before each text segment
+    
+    Returns:
+        Transcript text with optional timestamps
+    """
     try:
         from youtube_transcript_api import YouTubeTranscriptApi
         
@@ -15,8 +23,14 @@ def get_transcript_new_api(video_id: str) -> Optional[str]:
         transcript_data = ytt_api.fetch(video_id)
         
         if transcript_data:
-            text = ' '.join([entry.text for entry in transcript_data])
-            logger.info(f"Fetched transcript via API for {video_id} ({len(text)} chars)")
+            if include_timestamps:
+                # Format: [0:00] text [0:05] more text
+                text = ' '.join([f"[{int(entry.start//60)}:{int(entry.start%60):02d}] {entry.text}" 
+                                for entry in transcript_data])
+            else:
+                text = ' '.join([entry.text for entry in transcript_data])
+            
+            logger.info(f"Fetched transcript via API for {video_id} ({len(text)} chars, timestamps={include_timestamps})")
             return text
         return None
     except Exception as e:
@@ -114,11 +128,20 @@ def get_transcript_manual(video_id: str) -> Optional[str]:
         logger.error(f"Error in manual transcript fetch for video {video_id}: {str(e)}")
         return None
 
-def get_transcript_fallback(video_id: str) -> Optional[str]:
-    """Fetch transcript using API, fallback to manual scraping."""
-    result = get_transcript_new_api(video_id)
+def get_transcript_fallback(video_id: str, include_timestamps: bool = False) -> Optional[str]:
+    """Fetch transcript using API, fallback to manual scraping.
+    
+    Args:
+        video_id: YouTube video ID
+        include_timestamps: If True, includes [timestamp] before each text segment
+    
+    Returns:
+        Transcript text with optional timestamps
+    """
+    result = get_transcript_new_api(video_id, include_timestamps)
     if result:
         return result
     
     logger.info(f"Trying manual transcript fetch for {video_id}")
+    # Note: Manual scraping doesn't support timestamps
     return get_transcript_manual(video_id)

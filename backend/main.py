@@ -23,18 +23,28 @@ CORS(
     origins=["chrome-extension://*", "http://localhost:*", "https://localhost:*"],
 )
 
-# Get API key from environment
+# Get API configuration from environment
+API_PROVIDER = os.getenv("API_PROVIDER", "github")  # Default to github
+GITHUB_API_KEY = os.getenv("GITHUB_API_KEY")
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
 
-if not PERPLEXITY_API_KEY:
-    raise ValueError("PERPLEXITY_API_KEY environment variable is required")
+# Select API key based on provider
+if API_PROVIDER == "github":
+    if not GITHUB_API_KEY:
+        raise ValueError("GITHUB_API_KEY environment variable is required when using GitHub provider")
+    API_KEY = GITHUB_API_KEY
+else:
+    if not PERPLEXITY_API_KEY:
+        raise ValueError("PERPLEXITY_API_KEY environment variable is required when using Perplexity provider")
+    API_KEY = PERPLEXITY_API_KEY
 
-# Initialize ChromaDB RAG engine with Perplexity
+# Initialize ChromaDB RAG engine
 PERSIST_DIR = os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")
-rag_engine = ChromaDBVideoRAG(PERPLEXITY_API_KEY, PERSIST_DIR)
+# Set include_timestamps=True to add [MM:SS] timestamps to transcript chunks
+rag_engine = ChromaDBVideoRAG(API_KEY, PERSIST_DIR, API_PROVIDER, include_timestamps=False)
 
 # Initialize Notes Generator
-notes_generator = NotesGenerator(PERPLEXITY_API_KEY)
+notes_generator = NotesGenerator(API_KEY, API_PROVIDER)
 
 
 
@@ -337,8 +347,8 @@ def analyze_video():
                 400,
             )
 
-        # Analyze video sentiment
-        analysis = analyze_video_sentiment(video_id, PERPLEXITY_API_KEY)
+        # Analyze video sentiment (using GPT-4o mini to save quota)
+        analysis = analyze_video_sentiment(video_id, API_KEY, API_PROVIDER)
 
         # Check if analysis failed
         if "error" in analysis:

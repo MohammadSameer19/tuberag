@@ -1,5 +1,5 @@
 import requests
-from typing import List, Optional
+from typing import List, Optional, Dict
 from manual_transcript import get_transcript_fallback
 import chromadb
 from chromadb.utils import embedding_functions
@@ -14,12 +14,19 @@ class ChromaDBVideoRAG:
     Uses Perplexity API for LLM generation and local sentence-transformers for embeddings.
     """
 
-    def __init__(self, perplexity_api_key: str, persist_dir: str = "./chroma_db"):
-        self.perplexity_api_key = perplexity_api_key
+    def __init__(self, api_key: str, persist_dir: str = "./chroma_db", api_provider: str = "github", include_timestamps: bool = False):
+        self.api_key = api_key
         self.persist_dir = persist_dir
+        self.api_provider = api_provider
+        self.include_timestamps = include_timestamps
 
-        # Perplexity API endpoint
-        self.perplexity_url = "https://api.perplexity.ai/chat/completions"
+        # API endpoint based on provider
+        if api_provider == "github":
+            self.api_url = "https://models.github.ai/inference/chat/completions"
+            self.model = "openai/gpt-4o"  # Free with Copilot Pro
+        else:  # perplexity
+            self.api_url = "https://api.perplexity.ai/chat/completions"
+            self.model = "sonar-pro"
         
         # Use local multilingual sentence-transformers embedding (supports 50+ languages)
         self.embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
@@ -49,15 +56,23 @@ class ChromaDBVideoRAG:
             raise RuntimeError(f"Failed to get embedding: {e}")
 
     def _generate_content(self, prompt: str) -> str:
-        """Generate content using Perplexity API."""
+        """Generate content using GitHub Models or Perplexity API."""
         try:
-            headers = {
-                "Authorization": f"Bearer {self.perplexity_api_key}",
-                "Content-Type": "application/json"
-            }
+            if self.api_provider == "github":
+                headers = {
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                    "Accept": "application/vnd.github+json",
+                    "X-GitHub-Api-Version": "2022-11-28"
+                }
+            else:
+                headers = {
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json"
+                }
             
             payload = {
-                "model": "sonar-pro",
+                "model": self.model,
                 "messages": [
                     {"role": "user", "content": prompt}
                 ],
@@ -65,7 +80,7 @@ class ChromaDBVideoRAG:
                 "max_tokens": 1024
             }
             
-            response = requests.post(self.perplexity_url, headers=headers, json=payload)
+            response = requests.post(self.api_url, headers=headers, json=payload)
             response.raise_for_status()
             data = response.json()
             return data["choices"][0]["message"]["content"]
@@ -76,9 +91,9 @@ class ChromaDBVideoRAG:
     def _fetch_transcript(self, video_id: str) -> Optional[str]:
         """Fetch transcript from YouTube video."""
         try:
-            transcript_text = get_transcript_fallback(video_id)
+            transcript_text = get_transcript_fallback(video_id, self.include_timestamps)
             if transcript_text and transcript_text.strip():
-                logger.info(f"Fetched transcript for {video_id} ({len(transcript_text)} chars)")
+                logger.info(f"Fetched transcript for {video_id} ({len(transcript_text)} chars, timestamps={self.include_timestamps})")
                 return transcript_text
             return None
         except Exception as e:
